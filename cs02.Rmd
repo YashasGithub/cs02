@@ -1,0 +1,651 @@
+---
+title: "CS02 - Predicting Annual Air Pollution"
+author: "Ariana Talai, Coco Wang, Connie Chiang, Monica Park, and Yashas Chandrasekharan"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+## Introduction
+
+### Background
+
+With air pollution becoming the world’s second-highest risk factor for early death, according to the State of Global Air 2024 Report, air pollution has become one of the world’s most significant and largest environmental and health challenges. [^1] Air pollution is the release of harmful pollutants into the air that contaminate both the indoor and outdoor environments. These pollutants come in the form of solids, liquids, and gasses that are created in larger than normal concentrations and are derived from both natural and anthropogenic sources that alter the natural features of the atmosphere.  One of the most common types of air pollutants is particulate matter, also known as PM, which are very small solid and liquid particles that are suspended in the air. [^2] The size of these particulates are very closely related to their impact on human health and the health problems they’re associated with. Particulates classified as large coarse have a diameter greater than 10 micrometers, particulates referred to as coarse particulate matter (PM10-2.5) have a diameter between 2.5 and 10 micrometers, while particulates that have a diameter less than 2.5 micrometers are described as fine particulate matter (PM2.5). Particles that are smaller than 10 micrometers (PM10), are known to pose the greatest risk to people’s health as these small particles have the ability to penetrate the farthest within humans’ respiratory system via inhalation, all the way from populating in people’s lungs to settling in people’s bloodstream. [^3]
+
+Both short-term and long-term exposure to these particles has a great range of health impacts, with both levels of exposure being associated with a great range of diseases such as chronic obstructive pulmonary disease, stroke, intensified asthma, bronchus and lung cancers, type 2 diabetes, ALzhemier’s disease, and respiratory infections. [^4]. Furthermore, the International Agency for Research on Cancer has labeled air pollution, specifically PM2.5 a leading cause of cancer, while other research studies have discovered that persistent exposure to air pollution has the ability to affect every human organ, thus worsening existing health conditions or leading to new health problems developing. [^5] [^6] With air pollution contributing to 8.1 million deaths in 2021, which is more lives lost than deaths from tobacco use, and with air pollution shortening people’s lifespan by an average of 1 year and 8 months, there is an alarming urgency to bring attention and focus to this pressing issue. [^7]
+
+Though, there has been an improvement in air pollution levels and a corresponding decrease in air pollutant concentrations within the US since 1970 because  of the enactment of the Clean Air Act and technological advancements. [^8] However, the world still has a long way to go to ensure pollution rates stay beneath the recommended levels from the World Health Organization as 33% of people in America live in areas with unhealthy levels of air pollution. [^9] With there still being a high number of people breathing in harmful air, it’s thus crucial to have a high degree of detail and spatial accuracy in determining air pollution levels in order to classify the areas where people are undergoing unhealthy levels of air pollution exposure. With the Clean Air Act requiring states to establish air quality monitors, these monitor stations are what have been used historically to measure air quality. Though this act does not require states to have community-based monitors that could help pinpoint polluted  micro-climates, areas where people may be exposed to these unhealthy levels of air pollution, resulting in 120 million Americans living in counties that are not being regulated by air monitors. [^10] With these monitors being limited in amount in certain areas and not always being located near high-polluted areas, many places with micro environments may be completely overlooked and disregarded, resulting in an inaccurate assessment of air pollution levels in the US. Thus, this limits our ability to identify all high-risk areas and prevents us from understanding the full health impacts of air pollution.
+
+Though using machine learning models may provide a promising solution. In areas with a lack of monitoring systems or in places with low spatial granularity with the current air monitors, machine learning models can be used in substitute to predict air pollution concentrations. As a result, this leads us to the question of: With what accuracy can we predict US annual average air pollution concentrations?
+
+Though, it must be mentioned that machine learning methods are not always 100% accurate in their predictions, thus creating the high possibility for our predicted air pollution concentration levels to differ from the true air pollution concentration levels. This must be addressed in order to alert users who want to apply our results to improve air pollution levels, to use the results with caution to prevent any unintended consequences from happening. As a result, with the potential for there to be inaccuracies in our predictions, this raises the question of are there regional differences in our accuracy predictions compared to the true air pollution concentration levels? And if so, why? 
+
+Understanding the answers to these questions will be able to provide our world with a clearer and more informative understanding of what air pollution levels actually look like in the current world. Through having these answers on a more granular and precise scale, the results will be essential in uncovering the areas where air pollution and its health effects have consistently been going unnoticed, thus to better warn people inhabiting those areas aand to not allow air pollution to any longer be known as the "silent killer". By having a more complete understanding of the pollution exposure levels across the U.S., this information will be essential in not only more accurately identifying air pollution-related health effects, but also in more effectively decreasing air pollution-related health effects.
+
+[^1]: https://globalcleanair.org/academic/new-state-of-global-air-report-shows-pollutions-deadly-impact/#:~:text=There%20are%20disparities%20between%20nations,where%20the%20problem%20is%20greatest. 
+[^2]: https://www.health.nsw.gov.au/environment/air/Pages/particulate-matter.aspx 
+[^3]: https://www.nps.gov/subjects/air/humanhealth-pm.htm#:~:text=This%20pollution%2C%20also%20known%20as,potential%20for%20causing%20health%20problems. 
+[^4]: https://www.eea.europa.eu/en/topics/in-depth/air-pollution/eow-it-affects-our-health#:~:text=Both%20short%2D%20and%20long%2Dterm,asthma%20and%20lower%20respiratory%20infections. 
+[^5]: https://www.iarc.who.int/news-events/iarc-outdoor-air-pollution-a-leading-environmental-cause-of-cancer-deaths/ 
+[^6]: https://pmc.ncbi.nlm.nih.gov/articles/PMC6904854/#abs0010 
+[^7]: https://www.stateofglobalair.org/hap#top 
+[^8]: https://gispub.epa.gov/air/trendsreport/2019/#highlights 
+[^9]: https://www.lung.org/research/sota/key-findings#:~:text=The%20%E2%80%9CState%20of%20the%20Air,at%20least%20one%20failing%20grade. 
+[^10]: https://www.georgetownclimate.org/articles/community-based-air-quality-monitoring-equitable-climate-policy.html#:~:text=17,inappropriate%20to%20inform%20government%20action. 
+
+### Research Questions
+
+To reiterate the purpose of this study, we ask ourselves two questions:
+
+1. With what accuracy can we predict US annual average air pollution concentrations?
+
+2. Are there regional differences in our accuracy predictions compared to the true air pollution concentration levels? And if so, why? 
+
+
+## Setup
+
+```{r setup, include=FALSE}
+# control global Rmd chunk settings
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+```
+
+```{r install-packages,include=FALSE}
+# RUN THIS ONE TIME THEN COMMENT OUT THE CODE
+#install.packages("randomForest")
+#install.packages("vip")
+#install.packages("doParallel")
+```
+
+
+### Load packages
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+
+## The Data
+
+The data we are using for this case study comes from a researcher/professor, Roger D. Peneg, who was previously at  Johns Hopkins School of Public Health and studies air pollution and climate change. The data was obtained from a variety of sources, including the US Environmental Protection Agency, the National Aeronautics and Space Administration, the US Census, and the National Center for Health Statistics. This data includes both the one outcome variable and also all the predictor (feature) variables that we are interested in for  the context of our research questions. It has 876 rows and 50 columns, with each of the 876 rows indicating a distinct air monitor where 48 of the 50 columns for each represents a feature of that monitor, excluding the `id` (monitor number) and `value` columns (outcome variable). To get a better understanding of the 50 features , a table is included below describing the details of each feature:
+
+| Variable Feature | Explanation | 
+|:-----|------:|
+| **id**   |  The monitor's number |  
+| **fips**   |  The federal information processing standard number for the county where the monitor is located |  
+| **Lat**   |  Latitude of the monitor in degrees |  
+| **Lon**   |  Longitude of the monitor in degrees | 
+| **state**   |  The state of where the monitor is located | 
+| **county**   |  The county of where the monitor is located | 
+| **city**  |  The city of where the monitor is located | 
+| **CMAQ**   |  Estimated values of air pollution from a computational model called Community Multiscale Air Quality (CMAQ) | 
+| **zcta**   |  The	Zip Code Tabulation Area where the monitor is located | 
+| **zcta_area**   |  The land area of the zip code area in meters squared | 
+| **zcta_pop**   |  The population in the zip code area | 
+| **imp_a500**   |  Impervious surface (roads, concrete, parking lots, buildings) measure within a circle with a radius of 500 meters around the monitor. This is a measure of development | 
+| **imp_a1000**   |  Impervious surface measure within a circle with a radius of 1000 meters around the monitor | 
+| **imp_a5000**   |  Impervious surface measure within a circle with a radius of 5000 meters around the monitor | 
+| **imp_a10000**   |  Impervious surface measure within a circle with a radius of 10000 meters around the monitor |
+| **imp_a15000**   |  Impervious surface measure within a circle with a radius of 15000 meters around the monitor |
+| **county_area**   |  The land area of the county of the monitor in meters squared | 
+| **county_pop**   |  The population of the county of the monitor | 
+| **Log_dist_to_prisec**   |  	The log (Natural log) distance to a primary or secondary road (highway or major road) from the monitor | 
+| **log_pri_length_5000**   |  The count of primary road length (highways only) in meters in a circle with a radius of 5000 meters around the monitor (Natural log) | 
+| **log_pri_length_10000**   |  The count of primary road length (highways only) in meters in a circle with a radius of 10000 meters around the monitor (Natural log) | 
+| **log_pri_length_15000**   |  The count of primary road length (highways only) in meters in a circle with a radius of 15000 meters around the monitor (Natural log) | 
+| **log_pri_length_25000**   |  The count of primary road length (highways only) in meters in a circle with a radius of 25000 meters around the monitor (Natural log) | 
+| **log_prisec_length_500**   |  The count of primary and secondary road length (highway and secondary roads) in meters in a circle with a radius of 500 meters around the monitor (Natural log) | 
+| **log_prisec_length_1000**   |  The count of primary and secondary road length (highway and secondary roads) in meters in a circle with a radius of 1000 meters around the monitor (Natural log) | 
+| **log_prisec_length_5000**   |  The count of primary and secondary road length (highway and secondary roads) in meters in a circle with a radius of 5000 meters around the monitor (Natural log) | 
+| **log_prisec_length_10000**   |  The count of primary and secondary road length (highway and secondary roads) in meters in a circle with a radius of 500 meters around the monitor (Natural log) | 
+| **log_prisec_length_15000**   |  The count of primary and secondary road length (highway and secondary roads) in meters in a circle with a radius of 500 meters around the monitor (Natural log) | 
+| **log_prisec_length_25000**   |  The count of primary and secondary road length (highway and secondary roads) in meters in a circle with a radius of 25000 meters around the monitor (Natural log) | 
+| **log_nei_2008_pm25_sum_10000**   |  The tons of emissions from major sources data base (annual data) sum of all sources within a circle with a radius of 10000 meters of distance around the monitor (Natural log) | 
+| **log_nei_2008_pm25_sum_15000**   |  The tons of emissions from major sources data base (annual data) sum of all sources within a circle with a radius of 15000 meters of distance around the monitor (Natural log) | 
+| **log_nei_2008_pm25_sum_25000**   |  The tons of emissions from major sources data base (annual data) sum of all sources within a circle with a radius of 25000 meters of distance around the monitor (Natural log) | 
+| **log_nei_2008_pm10_sum_10000**   |  The tons of emissions from major sources data base (annual data) sum of all sources within a circle with a radius of 10000 meters of distance around the monitor (Natural log) | 
+| **log_nei_2008_pm10_sum_15000**   | The tons of emissions from major sources data base (annual data) sum of all sources within a circle with a radius of 15000 meters of distance around the monitor (Natural log) | 
+| **log_nei_2008_pm10_sum_25000**   |  The tons of emissions from major sources data base (annual data) sum of all sources within a circle with a radius of 25000 meters of distance around the monitor (Natural log) | 
+| **popdens_county **  |  The population density (number of people per kilometer squared area of the county) | 
+| **popdens_zcta**   |  The population density (number of people per kilometer squared area of zcta) | 
+| **nohs**   |  The percentage of people in zcta area where the monitor is that do not have a high school degree | 
+| **somehs**   |  The percentage of people in zcta area where the monitor whose highest formal educational attainment was some high school education | 
+| **hs**   |  The percentage of people in zcta area where the monitor whose highest formal educational attainment was completing a high school degree | 
+| **somecollege**   |  The percentage of people in zcta area where the monitor whose highest formal educational attainment was completing some college education | 
+| **associate**   |  The percentage of people in zcta area where the monitor whose highest formal educational attainment was completing an associate degree | 
+| **bachelor**   |  The percentage of people in zcta area where the monitor whose highest formal educational attainment was a bachelor’s degree | 
+| **grad**   |  	The percentage of people in zcta area where the monitor whose highest formal educational attainment was a graduate degree | 
+| **pov**   |  The percentage of people in zcta area where the monitor is that lived in poverty in 2008 | 
+| **hs_orless**   |  The percentage of people in zcta area where the monitor whose highest formal educational attainment was a high school degree or less (sum of nohs, somehs, and hs) | 
+| **urc2013**   |  The 2013 Urban-rural classification of the county where the monitor is located. This has 6 category variables where 1 is totally urban and 6 is completely rural | 
+| **urc2006**   |  The 2006 Urban-rural classification of the county where the monitor is located. This has 6 category variables where 1 is totally urban and 6 is completely rural | 
+| **aod**   | Aerosol Optical Depth measurement from a NASA satellite that is based on the diffraction of a laser and is used as a proxy of particulate pollution. It is unit-less and a higher value indicates more pollution. | 
+
+
+### Data Import
+
+We read in the data mentioned above into our program to begiin exploring our research questions. 
+
+```{r data-import}
+# for modeling, wrangled for model
+pm <- read_csv("data/pm25_data.csv")
+
+# for EDA and visualisations, wrangled for visual
+pm_25 <- read_csv("data/pm25_data.csv")
+
+```
+
+### Data Wrangling
+
+After looking at the raw data, we decided to convert certain columns into more usable formats and add additional columns to have more information to work with. This included converting the discrete variables (`id`, `fips`, `zcta`, `urc2013`, `urc2006`) into factors in order to better manipulate the data, creating a new binary column,`inCity`, with 2 categories in order to prevent having NA values within our analysis, and creating 4 new columns (`zcta_area_km2`, `county_area_km2`, `urban_rural`, `aod_category`) based on pre-existing columns in order to make our subsequent data analysis a more simplified process as it will allow us to have this additional information already at our disposal.
+```{r data-wrangling}
+# converting id, fips, and zcta to factors
+pm <- pm |>
+  mutate(across(c(id, fips, zcta), as.factor)) 
+pm_25 <- pm_25 |>
+  mutate(across(c(id, fips, zcta), as.factor))
+
+# convert the city variable to binary string variable
+pm_25 <- pm_25 |>
+  mutate(inCity = case_when(city == "Not in a city" ~ "Not in a city",
+                          city != "Not in a city" ~ "In a city")) |>
+  mutate(inCity = as.factor(inCity))
+
+# check for NA values
+colSums(is.na(pm_25))
+
+# convert areas to square kilometers and calculate population density
+pm_25 <- pm_25 |>
+  mutate(zcta_area_km2 = zcta_area / 1e6, county_area_km2 = county_area / 1e6) |>
+  mutate(popdens_county = county_pop / county_area_km2, popdens_zcta = zcta_pop / zcta_area_km2)
+
+# simplify urban/rural variables
+pm_25 <- pm_25 |>
+  mutate(urban_rural = ifelse(urc2013 <= 3, "Urban", "Rural")) |>
+  mutate(urban_rural = as.factor(urban_rural))
+
+# describe the AOD variable
+summary(pm_25$aod)
+sd(pm_25$aod)
+range(pm_25$aod)
+
+# categorise AOD using the quartiles
+pm_25 <- pm_25 |>
+  mutate(aod_category = case_when(
+    aod < 31.66 ~ "Low",
+    aod <= 49.67 ~ "Medium",
+    TRUE ~ "High"
+  )) |>
+  mutate(aod_category = as.factor(aod_category)) 
+
+# convert urban-rural classifications to ordered factors
+pm_25 <- pm_25 |>
+  mutate(urc2013 = factor(urc2013, levels = 1:6, ordered = TRUE),
+         urc2006 = factor(urc2006, levels = 1:6, ordered = TRUE))
+```
+
+## Data Analysis
+
+### Exploratory Data Analysis
+
+After wrangling the data through converting certain columns into a more usable format and adding additional columns that provide helpful information regarding our research questions, we decided to explore our data even further to better understand its behavior and whether relationships existed between our variables.
+
+
+To begin, we wanted to explore the air pollution levels on a state-level scale in order to better understand whether there truly is a difference in pollution levels across different parts of the world, and if so, which states experience more harmful effects of pollution than others. This plot shows the distribution of air pollution by state where the x-axis represents states and is ordered by average AOD in descending order and the y-axis shows AOD values, which measure atmospheric matter (PM2.5) and their impact on air quality. By looking at this distribution, this will provide us with a clear visualization and a stronger background knowledge of the measurement values that have currently been able to be recorded.  
+```{r first-eda-plot}
+ggplot(pm_25, aes(x = reorder(state, -aod), y = aod)) +
+  geom_boxplot() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(title = "Distribution of Air Pollution by State", subtitle = "The States of the U.S. Have an Extensive Spread of Air Pollution Levels", x = "State", y = "AOD")
+```
+
+Through looking at this graph it can be seen, that the only states included are the contiguous U.S.(excludes Hawaii and Alaska) and has an additional location of the District of Columbia, thus meaning there is a total of 49 values for our `state` variable. From this plot, it can be seen that while there are a handful of states with a wide and high range of air pollution levels, there is a much greater amount of states that have a smaller range of air pollution levels which all have a similar average air quality level and thus, it can definitely be seen that there is a difference in the level of air pollution exposure people across the country experience. Furthermore, with there being an overwhelming number of states with low pollution levels, this re-emphasizes the initial problem of how current air pollution measurements may be underestimating the true amount of air pollution people are experiencing in these states from a lack of granularity.
+ 
+
+And the second graph we have is a scatter plot of population density on the y-axis. x-axis represents population density measured at the ZCTA level, while y-axis represents AOD--an indicator of particulate pollution in the air. Each point represents a ZCTA, with its position determined by the population density and AOD values. And the points show variablity in AOD, within the areas with low population density. 
+
+```{r second-eda-plot}
+ggplot(pm_25, aes(x = popdens_zcta, y = aod)) +
+  geom_point(alpha = 0.5) +
+  theme_minimal() +
+  labs(subtitle = "Wide Range of Particulate Pollution Levels for Population Densities of 10,000\n People or Lower per Kilometer Squared Area of Zip Code Tabulation Area", title = "Population Density vs AOD", x = "Population Density (ZCTA)", y = "AOD")
+```
+
+This scatter plot helps identify correlations between population density and AOD values. More dense clusters of points can highlight areas with specific characteristics. It suggests a high variability in AOD levels at lower population densities and some data points with higher population densities have varying AOD levels. From this plot, we cam see that on low-density areas, other environmental factors are most likely to dominate AOD levels. Urban areas with higher density may have more predictable pollution patterns, but some variability can still exists. This plot does now show a strong linear correlation between two factors, however, it does highlights that AOD levels can be influenced by other factors.  
+
+
+### Predicting Air Pollution Analysis
+
+We aim to build a model that better predicts air pollution levels, specifically PM2.5 concentrations, based on various geographic, demographic, and environmental predictors. The analysis progresses to employing a random forest model, which better captures complex patterns by leveraging an ensemble of decision trees. Model performance is evaluated using metrics like RMSE and r-square, calculated on both training and testing datasets. Cross-validation is employed to ensure the model generalizes well to unseen data, and hyperparameter tuning optimizes the random forest's parameters. The final tuned model is applied to the testing dataset, and predictions are generated.
+
+```{r split-data}
+#Randomly split the data into training (2/3) and testing (1/3) subsets for training and evaluating the model. Setting the seed ensures reproducibility of the split.
+set.seed(1234)
+pm_split <- rsample::initial_split(data = pm, prop = 2/3)
+pm_split
+
+train_pm <- rsample::training(pm_split)
+test_pm <- rsample::testing(pm_split)
+ 
+# Scroll through the output!
+count(train_pm, state)
+
+simple_rec <- train_pm |>
+  recipes::recipe(value ~ .)
+
+simple_rec
+
+simple_rec <- train_pm |>
+  recipes::recipe(value ~ .) |>
+  recipes::update_role(id, new_role = "id variable")
+
+simple_rec
+
+simple_rec <- recipe(train_pm) |>
+    update_role(everything(), new_role = "predictor") |>
+    update_role(value, new_role = "outcome") |>
+    update_role(id, new_role = "id variable")
+
+simple_rec
+
+summary(simple_rec)
+
+simple_rec |>
+  step_dummy(state, county, city, zcta, one_hot = TRUE)
+
+simple_rec |>
+  update_role("fips", new_role = "county id")
+
+simple_rec |>
+  step_corr(all_predictors(), - CMAQ, - aod)
+
+simple_rec |>
+  step_nzv(all_predictors(), - CMAQ, - aod)
+
+simple_rec <- simple_rec |> 
+  update_role("fips", new_role = "county id") |>
+  step_dummy(state, county, city, zcta, one_hot = TRUE) |>
+  step_corr(all_predictors(), - CMAQ, - aod)|>
+  step_nzv(all_predictors(), - CMAQ, - aod)
+  
+simple_rec
+
+prepped_rec <- prep(simple_rec, 
+                    verbose = TRUE, 
+                    retain = TRUE )
+
+names(prepped_rec)
+
+baked_train <- bake(prepped_rec, new_data = NULL)
+
+glimpse(baked_train)
+
+baked_test_pm <- recipes::bake(prepped_rec, new_data = test_pm)
+glimpse(baked_test_pm)
+
+traincities <- train_pm |> distinct(city)
+testcities <- test_pm |> distinct(city)
+
+#get the number of cities that were different
+dim(dplyr::setdiff(traincities, testcities))
+
+#get the number of cities that overlapped
+dim(dplyr::intersect(traincities, testcities))
+
+pm <- pm |>
+  mutate(city = case_when(city == "Not in a city" ~ "Not in a city",
+                          city != "Not in a city" ~ "In a city"))
+
+set.seed(1234) # same seed as before
+pm_split <- rsample::initial_split(data = pm, prop = 2/3)
+pm_split
+
+ train_pm <- rsample::training(pm_split)
+ test_pm <- rsample::testing(pm_split)
+
+novel_rec <- recipe(train_pm) |>
+    update_role(everything(), new_role = "predictor") |>
+    update_role(value, new_role = "outcome") |>
+    update_role(id, new_role = "id variable") |>
+    update_role("fips", new_role = "county id") |>
+    step_dummy(state, county, city, zcta, one_hot = TRUE) |>
+    step_corr(all_numeric()) |>
+    step_nzv(all_numeric()) 
+
+prepped_rec <- prep(novel_rec, verbose = TRUE, retain = TRUE)
+
+baked_train <- bake(prepped_rec, new_data = NULL)
+
+glimpse(baked_train)
+
+baked_test_pm <- bake(prepped_rec, new_data = test_pm)
+
+glimpse(baked_test_pm)
+
+set.seed(1234)
+vfold_pm <- rsample::vfold_cv(data = train_pm, v = 4)
+vfold_pm
+pull(vfold_pm, splits)
+
+```
+
+First, the dataset is split into training and testing subsets to ensure the model is trained on one portion of the data and evaluated on a separate, unseen portion. Preprocessing steps are defined using a recipe, which standardizes operations such as assigning roles to variables, encoding categorical data, removing redundant or low-variance features, and handling transformations to make the data suitable for modeling. The recipe is then trained on the training data and applied to both the training and testing datasets. A cross-validation is also set up to evaluate the model’s performance across multiple data splits. The overall process prepares the data, applies transformations, and lays the groundwork for robust model training and evaluation.
+
+
+
+```{r recipe-creation}
+RF_rec <- recipe(train_pm) |>
+    update_role(everything(), new_role = "predictor")|>
+    update_role(value, new_role = "outcome")|>
+    update_role(id, new_role = "id variable") |>
+    update_role("fips", new_role = "county id") |>
+    step_novel("state") |>
+    step_string2factor("state", "county", "city") |>
+    step_rm("county") |>
+    step_rm("zcta") |>
+    step_corr(all_numeric())|>
+    step_nzv(all_numeric())
+
+
+RF_PM_model <- parsnip::rand_forest(mtry = 10, min_n = 3) |> 
+  set_engine("randomForest") |>
+  set_mode("regression")
+
+RF_PM_model
+
+RF_wflow <- workflows::workflow() |>
+  workflows::add_recipe(RF_rec) |>
+  workflows::add_model(RF_PM_model)
+
+RF_wflow
+
+RF_wflow_fit <- parsnip::fit(RF_wflow, data = train_pm)
+
+RF_wflow_fit
+
+RF_wflow_fit |> 
+  extract_fit_parsnip() |> 
+  vip::vip(num_features = 10)
+
+set.seed(456)
+resample_RF_fit <- tune::fit_resamples(RF_wflow, vfold_pm)
+collect_metrics(resample_RF_fit)
+
+tune_RF_model <- rand_forest(mtry = tune(), min_n = tune()) |>
+  set_engine("randomForest") |>
+  set_mode("regression")
+    
+tune_RF_model
+
+RF_tune_wflow <- workflows::workflow() |>
+  workflows::add_recipe(RF_rec) |>
+  workflows::add_model(tune_RF_model)
+
+RF_tune_wflow
+
+n_cores <- parallel::detectCores()
+n_cores
+
+doParallel::registerDoParallel(cores = n_cores)
+
+set.seed(123)
+tune_RF_results <- tune_grid(object = RF_tune_wflow, resamples = vfold_pm, grid = 20)
+tune_RF_results
+
+tune_RF_results |>
+  collect_metrics()
+
+show_best(tune_RF_results, metric = "rmse", n = 1)
+
+tuned_RF_values <- select_best(tune_RF_results, metric = "rmse")
+tuned_RF_values
+
+
+# specify best combination from tune in workflow
+RF_tuned_wflow <-RF_tune_wflow |>
+  tune::finalize_workflow(tuned_RF_values)
+
+# fit model with those parameters on train AND test
+overallfit <- RF_wflow |>
+  tune::last_fit(pm_split)
+
+collect_metrics(overallfit)
+
+test_predictions <- collect_predictions(overallfit)
+```
+```{r}
+RF_final_train_fit <- parsnip::fit(RF_tune_wflow, data = train_pm)
+RF_final_test_fit <- parsnip::fit(RF_tuned_wflow, data = test_pm)
+
+# get predictions on training data
+values_pred_train <- predict(RF_final_train_fit, train_pm) |> 
+  bind_cols(train_pm |> select(value, fips, county, id)) 
+
+# get predictions on testing data
+values_pred_test <- predict(RF_final_test_fit, test_pm) |> 
+  bind_cols(test_pm |> select(value, fips, county, id)) 
+values_pred_test
+```
+
+
+First, a recipe is constructed to preprocess the data by defining predictors, handling categorical variables, and removing redundant or low-variance features. The model is then specified using the randomForest with parameters such as the number of features and minimum node size. A workflow is created to integrate the preprocessing steps and the model. The model is trained on the training dataset, and its feature importance is evaluated to understand the contribution of each predictor.
+
+The process then moves to hyperparameter tuning, where a grid search identifies the best values for the parameters. Using parallel computing, multiple configurations are tested efficiently. Once the optimal parameters are selected, the workflow is finalized and retrained on the entire training dataset, and its performance is evaluated on both the training and testing datasets. Predictions are generated for both sets, which are then compared against actual values to assess the model’s accuracy.
+
+From the visualization showing the top 10 most important features in the Random Forest model, the importance of the feature reflects how much it contributes to the model's predictive performance. State is the most influential feature, indicating that geographic location plays a significant role in predicting the target variable. Differences between states may capture variability in environmental or demographic factors affecting PM2.5 levels. This leads to our extension part on geographical features.
+
+With a RMSE of 1.67 and a r-square of 0.591, this confirms that the Random Forest model has moderate predictive power, explaining about 59.1% of the variance in the data with an average prediction error of 1.67 units. The cross-validation results are consistent, as indicated by the relatively low standard errors. This process ensures that the model's performance generalizes well to unseen data.
+
+### Mapping Our Predictions
+
+With our prediction values, we aim to plot the predicted values and the actual values of air pollution of each of the original monitor locations with their approximate geographical locations on the graph. We originally aimed to do this utilising the sf, maps, and rnaturalearth libraries, but an external issue with datahub prevented us from doing this. We came up with a work-around that makes the plot solely with ggplot2 by downloading a free-to-use, public shape file of all the counties in the United States and converted into a CSV file to merge with our existing dataset. This involved wrangling the data by joining three dataframes into one and plotting the final merged dataset.
+
+```{r wrangle-map-data}
+county_polygons <- read.csv("data/tl_2024_us_county.csv")
+
+# Create the state_fips table (state names and corresponding STATEFP codes)
+state_fips <- data.frame(
+  STATEFP = c(1, 2, 4, 5, 6, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 47, 48, 49, 50, 51, 53, 54, 55, 56, 60, 66, 69, 72, 78),
+  state = c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "District of Columbia", 
+            "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine",
+            "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada",
+            "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", 
+            "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", 
+            "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming", "American Samoa", "Guam", "Northern Mariana Islands", 
+            "Puerto Rico", "U.S. Virgin Islands")
+)
+
+
+values_pred_test$id <- as.character(values_pred_test$id)
+pm_25$id <- as.character(pm_25$id)
+
+merged_pm_data <- inner_join(values_pred_test, pm_25, by = "id")
+
+merged_pm_data <- merged_pm_data |>
+  mutate(county = coalesce(county.x, county.y)) |>
+  select(-county.x, -county.y) |> # Removes the old columns after combining 
+  mutate(value = coalesce(value.x, value.y)) |>
+  select(-value.x, -value.y)  # Removes the old columns after combining
+
+merged_pm_data
+
+county_polygons <- county_polygons |>
+  left_join(state_fips, by = "STATEFP") |>
+  rename(county = NAME)
+
+final_plot_data <- inner_join(merged_pm_data, county_polygons, by = c("state", "county"))
+```
+
+After wrangling, we plot the actual pollution values:
+
+```{r plot-actual}
+actual_plot <- ggplot(final_plot_data, aes(x = as.numeric(INTPTLON), y = as.numeric(INTPTLAT), color = value)) +
+  geom_point(size = 2, alpha = 0.7) +
+  scale_color_gradient(low = "blue", high = "red", na.value = "gray", name = "PM µg/m3") +
+  labs(title = "True PM 2.5 Levels", x = "Longitude", y = "Latitude") +
+  theme_minimal()
+
+print(actual_plot)
+```
+
+And then our predicted values:
+
+```{r plot-predicted}
+# Step 3: Create plot for predicted PM2.5 values
+predicted_plot <- ggplot(final_plot_data, aes(x = as.numeric(INTPTLON), y = as.numeric(INTPTLAT), color = .pred)) +
+  geom_point(size = 2, alpha = 0.7) +
+  scale_color_gradient(low = "blue", high = "red", na.value = "gray", name = "PM µg/m3") +
+  labs(title = "Predicted PM 2.5 Levels", x = "Longitude", y = "Latitude") +
+  theme_minimal()
+
+print(predicted_plot)
+```
+
+And finally, to visualise the differences between our model's predicted values and the actual values, we plot a graph of the error between the predicted and actual values, highlighting locations where the difference reaches above a threshold of 3 units:
+
+```{r plot-error}
+final_plot_data$error <- abs(final_plot_data$value - final_plot_data$.pred)
+
+# Step 2: Set a threshold for highlighting (for example, a high error is > 10)
+threshold <- 3
+
+# Step 2A: Create a dataframe with the high error entries for later
+high_discrepancy_data <- final_plot_data |> 
+  filter(error > threshold)
+
+# Step 3: Create the plot with highlighted points for high error
+ggplot(final_plot_data) +
+  geom_point(aes(x = as.numeric(INTPTLON), y = as.numeric(INTPTLAT), color = error), size = 2, alpha = 0.7) +
+  scale_color_gradient(low = "blue", high = "red", na.value = "gray", name = "Error (µg/m³)") +
+  geom_point(data = final_plot_data %>% filter(error > threshold), 
+             aes(x = as.numeric(INTPTLON), y = as.numeric(INTPTLAT)), 
+             color = "red", size = 4, shape = 21, fill = "yellow") +  # Highlight points with high error
+  labs(title = "Predicted vs Actual PM 2.5 Levels (Highlighted High Errors)", x = "Longitude", y = "Latitude") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+The four regions highlighted in this graph indicate four individual monitors in four separate counties: Victorville, Visalia, Bakersfield, and Keeler. We will dive into these regions more in our extension.
+
+### Extension
+
+In response to the four regions selected for having high errors above a threshold of 3 mu*g/m^3, we carried out further exploratory data analysis in hopes of pinpointing why PM25 prediction accuracy is poorer in these regions compared to the rest of the dataset. The data for these 4 selected monitors are as follows:
+```{r error-monitors}
+head(high_discrepancy_data)
+high_error_data <- final_plot_data |> 
+  filter(id %in% c("6027.1003", "6029.0016", "6071.0306", "6107.2002"))
+```
+
+
+Our first attempt of exploring the data was creating scatter plots of the key metrics (estimate of air pollution by CMAQ, total roads within a 25,000m radius of the monitor, and total tons of emissions within a 25,000m radius from the monitor) for each of these monitors (labelled by the city they're located it in the plots below):
+```{r extension-outliers}
+ggplot(high_error_data, aes(x = reorder(city, -CMAQ), y = CMAQ)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, size = 2, alpha = 0.7) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(hjust = 1)) +
+  labs(
+    title = "No Obvious Outliers Seen in Predicted Air Quality Across High-Error Monitors",
+    subtitle = "Distribution of CMAQ Levels for Monitors with High Error in PM25 Predictions",
+    x = "City",
+    y = "CMAQ Levels"
+  )
+ggplot(high_error_data, aes(x = reorder(city, -log_prisec_length_25000), y = log_prisec_length_25000)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, size = 2, alpha = 0.7) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(hjust = 1)) +
+  labs(
+    title = "No Obvious Outliers Seen in Total Roads Distribution Across High-Error Monitors",
+    subtitle = "Distribution of Total Roads (m) for Cities with High Error in PM25 Predictions",
+    x = "City",
+    y = "Meters of Roads within r=25,000m of Monitor"
+  )
+
+ggplot(high_error_data, aes(x = reorder(city, -log_nei_2008_pm25_sum_25000), y = log_nei_2008_pm25_sum_25000)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, size = 2, alpha = 0.7) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(hjust = 1)) +
+  labs(
+    title = "Few Outliers Seen in Emissions Distribution Across High-Error Monitors",
+    subtitle = "Distribution of Emissions for Cities with High Error in PM25 Predictions",
+    x = "City",
+    y = "Log-Transformed Tons of Emissions within r=25,000m of Monitor"
+  )
+```
+
+Unfortunately, despite examining **CMAQ levels, total roads, and emissions**, no substantial outliers were observed in the four monitors that might explain their prediction errors. The prediction errors for these cities are likely driven by other unmeasured factors or complexities not captured by the model.
+
+Another attempt we made at exploring the data was looking for correlations between the error (difference of predicted vs true value of PM25 levels) and the same features we identified above. In the plots below, the data point for the high-error monitors are highlighted in red, while all other monitors are shown in grey:
+```{r extension-correlations}
+high_error_data2 <- final_plot_data|>
+  mutate(highlight = ifelse(id %in% c("6027.1003", "6029.0016", "6071.0306", "6107.2002"), "High-Error City", "Other"))
+ggplot(high_error_data2, aes(x = CMAQ, y = error, color = highlight)) +
+  geom_point(alpha = 0.7) +
+  scale_color_manual(values = c("High-Error City" = "tomato", "Other" = "gray")) +
+  theme_minimal() +
+  labs(
+    title = "Prediction Error vs. CMAQ Score",
+    x = "CMAQ Score",
+    y = "Prediction Error",
+    color = "City Category"
+  )
+ggplot(high_error_data2, aes(x = log_prisec_length_25000, y = error, color = highlight)) +
+  geom_point(alpha = 0.7) +
+  scale_color_manual(values = c("High-Error City" = "tomato", "Other" = "gray")) +
+  theme_minimal() +
+  labs(
+    title = "Prediction Error vs. Total Roads Nearby",
+    x = "Total Roads within 25,000 radius (m of roads)",
+    y = "Prediction Error",
+    color = "City Category"
+  )
+ggplot(high_error_data2, aes(x = log_nei_2008_pm25_sum_25000, y = error, color = highlight)) +
+  geom_point(alpha = 0.7) +
+  scale_color_manual(values = c("High-Error City" = "tomato", "Other" = "gray")) +
+  theme_minimal() +
+  labs(
+    title = "Prediction Error vs. Total Emissions Nearby",
+    x = "Log transformed tons of total emissions within 25,000 radius of monitor",
+    y = "Prediction Error",
+    color = "City Category"
+  )
+```
+
+Again, no strong correlations were found between prediction errors and model features such as **CMAQ, roads, or emissions**. The errors for the four monitors, especially Bakersfield and Keeler, do not diverge significantly from broader trends (that is to say, no obvious trend between error and CMAQ, roads, nor emissions). This suggests that the high errors may stem from local factors or systematic biases not represented in the current dataset.
+
+**Possible research directions for Bakersfield and Keeler:**
+
+* Bakersfield stands out as having the highest prediction error (6.63). This may be linked to the city's stark socioeconomic disparities and pollution challenges. According to a report from The Guardian, Bakersfield’s eastern region is home predominantly to low-income people of color, residing near significant sources of pollution, including oil wells, pesticide-heavy agricultural fields, freeways, and a busy rail yard. These areas lie downwind of pollution sources, exacerbating exposure risks. [^11] The monitor in Bakersfield, situated in an area with a poverty score of 22.1, might reflect the complex interaction of these factors, which the random forest model struggles to capture fully.
+
+* Keeler, in contrast, is a ghost town with a very small population, which introduces unique modeling challenges. As an unincorporated community, Keeler lacks significant infrastructure and is characterized by sparse human activity, making it an outlier compared to other cities in the dataset. Its low population density may result in atypical pollution patterns or monitoring inconsistencies that are difficult for the model to predict. Historical accounts describe Keeler as a nearly abandoned area with minimal development, which might contribute to its unexpected prediction error. [^12]
+
+[^11]: https://www.theguardian.com/us-news/2023/mar/08/us-air-pollution-people-of-color-census-districts
+[^12]: https://en.wikipedia.org/wiki/Keeler,_California
+
+## Results & Discussion 
+
+Our exploratory data analysis revealed noticeable differences in AOD distributions across U.S. states, as depicted in the box plot. States such as New Jersey, the District of Columbia, and California demonstrated higher median AOD levels with wide interquartile ranges, indicating substantial variability in air pollution levels. In contrast, states like Vermont, Wyoming, and New Mexico exhibited consistently lower AOD values, with narrow interquartile ranges. These trends suggest that regions with urban centers and dense populations are prone to higher pollution levels, whereas less industrialized and more rural states maintain cleaner air quality. Outliers in high-AOD states, particularly in California, reflect localized instances of extreme particulate pollution, possibly attributable to wildfire activity or concentrated industrial emissions. These extreme values highlight the importance of considering geographic and environmental influences when interpreting air quality data. 
+
+Additionally, the scatter plot of population density versus AOD showed a cluster of data points for areas with population densities below 10,000 people per square kilometer. In these regions, AOD levels displayed a broad range, demonstrating significant variability in pollution levels at lower population densities. For higher population densities (above 10,000), the distribution appeared more scattered, with some data points corresponding to elevated AOD levels. However, no clear linear relationship between population density and AOD was observed, suggesting that population density alone is not a strong predictor of particulate pollution.
+
+Our predictive model, designed to estimate AOD based on population density, achieved an RSME of 1.67 units, which reflects the proportion of correctly predicted AOD values in comparison to actual observed values. This indicates a relatively strong fit for the model in predicting AOD across the dataset, though there are still notable discrepancies between predicted and actual values, particularly for areas with extreme AOD readings. This is expected given the complex nature of air pollution and the multitude of variables influencing AOD levels.
+
+Through our random forest model, we created a set of predicted values to compare against the actual values. To this end, we could see that the model generally performed well, with four counties demonstrating error values above 3 mu*g/m^3. We try to establish reasons why this was the case in our extension, but fail to capture adequate reasoning within the confines of the model and its predictors. Nonetheless, the model performs sufficiently in all other aspects and can be used with an appropriate amount of confidence in predicting air pollution values for counties in the United States.
+
+Several limitations of this study should be noted. Firstly, the scatter plot does not provide a clear trend between population density and AOD, limiting its explanatory power. Additional predictors, such as industrial activity, vehicular emissions, and meteorological data, could improve the analysis. Second, outliers in both visualizations indicate potential data anomalies or unmeasured events, such as extreme weather conditions or wildfire activity, which require further investigation. Lastly, the data may not capture temporal variability in pollution levels, as it represents a snapshot rather than continuous measurements. Furthermore, this data is only from the US so we can't apply this model or results to areas outside the contiguous U.S., thus making the generalizability of our model limited. Additionally, outdoor pollution levels don't necessarily portray people's individual exposure to pollution. This is because people are exposed to different pollution levels indoors versus outdoors and people spend different amounts of time indoors and outdoors. Thus, these results can't be used to predict air pollution concentrations on a personal level.
+
+## Conclusion
+
+Our EDA highlighted the significant variability in air pollution (AOD) levels across the United States, with urbanized and industrialized states such as New Jersey and California exhibiting higher median AOD levels compared to rural states like Vermont and Wyoming. This variability underscores the influence of regional factors, including population density, industrial activity, and geographic context, on air quality. While population density appeared to contribute to pollution levels in urbanized regions, our findings showed no clear linear relationship between density and AOD, suggesting that other factors, such as meteorology, emissions controls, and industrial activity, likely play a more dominant role.
+
+The wide range of AOD levels observed at lower population densities emphasizes the importance of localized environmental factors, such as topography and proximity to natural pollution sources, in shaping air quality. These results highlight the complexity of air pollution dynamics and the need for multifaceted approaches to understanding and mitigating particulate pollution.
+
+Future research should incorporate additional variables, including industrial emissions data and meteorological conditions, to better capture the drivers of air pollution. This would help improve both exploratory data analysis and modelling. Moreover, addressing limitations such as the absence of temporal data and the presence of outliers will strengthen the generalizability of these findings. These efforts will help guide policymakers in developing targeted interventions to improve air quality and public health outcomes.
